@@ -1,0 +1,96 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
+
+import { mockDeliveryLocation } from '../../mock/data';
+
+export function Header() {
+  const navigate = useNavigate();
+  const { cart } = useCart();
+  const { user, logout } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [accountOpen, setAccountOpen] = useState(false);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+  };
+
+  return (
+    <header className="bg-amazon-dark text-white sticky top-0 z-50">
+      <div className="flex items-center gap-4 px-4 py-2 max-w-[1600px] mx-auto">
+        <Link to="/" className="text-amazon-nav-hover hover:text-white text-2xl font-bold">
+          amazon
+        </Link>
+
+        <div className="flex items-start gap-1 text-sm text-gray-300">
+          <span className="text-xs">Deliver to</span>
+          <span className="font-semibold text-white">{mockDeliveryLocation.label}</span>
+        </div>
+
+        <form onSubmit={handleSearch} className="flex-1 flex max-w-[600px]">
+          <input
+            type="search"
+            placeholder="Search Amazon"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 px-3 py-2 text-amazon-dark rounded-l"
+          />
+          <button type="submit" className="bg-amazon-orange text-amazon-dark px-4 rounded-r hover:bg-amber-500">
+            Search
+          </button>
+        </form>
+
+        <div className="flex items-center gap-2 relative">
+          <div
+            className="relative cursor-pointer"
+            onMouseEnter={() => setAccountOpen(true)}
+            onMouseLeave={() => setAccountOpen(false)}
+          >
+            <span className="text-sm">
+              {user ? `Hello, ${user.name}` : 'Account & Lists'}
+            </span>
+            {accountOpen && (
+              <div className="absolute right-0 top-full mt-1 w-56 bg-white text-amazon-dark rounded shadow-lg py-2 z-50">
+                {user ? (
+                  <>
+                    <Link to="/account/orders" className="block px-4 py-1 hover:bg-gray-100">Orders</Link>
+                    <Link to="/account/profile" className="block px-4 py-1 hover:bg-gray-100">Profile</Link>
+                    <Link to="/account/lists" className="block px-4 py-1 hover:bg-gray-100">Lists</Link>
+                    <button onClick={logout} className="w-full text-left px-4 py-1 hover:bg-gray-100">
+                      Sign out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="block px-4 py-2 text-center font-semibold border border-amazon-dark rounded mx-2 mb-2">
+                      Sign in
+                    </Link>
+                    <Link to="/register" className="block px-4 py-1 hover:bg-gray-100">New customer? Start here.</Link>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
+          <Link to="/account/orders" className="text-sm whitespace-nowrap">Returns & Orders</Link>
+
+          <Link to="/cart" className="flex items-end gap-0">
+            <span className="text-2xl">🛒</span>
+            <span className="text-amazon-orange font-bold">{cart.itemCount}</span>
+            <span className="text-sm">Cart</span>
+          </Link>
+        </div>
+      </div>
+
+      <nav className="bg-amazon-dark-light px-4 py-1 flex items-center gap-4 text-sm">
+        <Link to="/" className="hover:text-amazon-nav-hover">All</Link>
+        <Link to="/search?category=deals" className="hover:text-amazon-nav-hover">Today's Deals</Link>
+        <Link to="/customer-service" className="hover:text-amazon-nav-hover cursor-pointer">Customer Service</Link>
+        <Link to="/registry" className="hover:text-amazon-nav-hover cursor-pointer">Registry</Link>
+        <Link to="/gift-cards" className="hover:text-amazon-nav-hover cursor-pointer">Gift Cards</Link>
+      </nav>
+    </header>
+  );
+}

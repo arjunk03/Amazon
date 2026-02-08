@@ -12,6 +12,10 @@ import { CheckoutConfirmationPage } from './pages/CheckoutConfirmationPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { SellerLoginPage } from './pages/SellerLoginPage';
+import { SellerRegisterPage } from './pages/SellerRegisterPage';
+import { SellerDashboard } from './pages/SellerDashboard';
+import { AddProductPage } from './pages/AddProductPage';
 import { AccountOrdersPage } from './pages/AccountOrdersPage';
 import { AccountOrderDetailPage } from './pages/AccountOrderDetailPage';
 import { AccountProfilePage } from './pages/AccountProfilePage';
@@ -38,6 +42,10 @@ function App() {
               <Route path="checkout/confirmation" element={<CheckoutConfirmationPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
+              <Route path="seller/login" element={<SellerLoginPage />} />
+              <Route path="seller/register" element={<SellerRegisterPage />} />
+              <Route path="seller/dashboard" element={<SellerDashboard />} />
+              <Route path="seller/add-product" element={<AddProductPage />} />
               <Route path="forgot-password" element={<ForgotPasswordPage />} />
               <Route path="account/orders" element={<AccountOrdersPage />} />
               <Route path="account/orders/:orderId" element={<AccountOrderDetailPage />} />

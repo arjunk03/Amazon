@@ -55,10 +55,18 @@ export function Header() {
               <div className="absolute right-0 top-full mt-1 w-56 bg-white text-amazon-dark rounded shadow-lg py-2 z-50">
                 {user ? (
                   <>
+                    <div className="px-4 py-2 border-b border-gray-100 mb-1">
+                      <p className="font-bold text-sm">Your Account</p>
+                    </div>
+                    {user.user_type === 'seller' && (
+                      <Link to="/seller/dashboard" className="block px-4 py-1 hover:bg-gray-100 text-amazon-orange font-semibold">
+                        Seller Dashboard
+                      </Link>
+                    )}
                     <Link to="/account/orders" className="block px-4 py-1 hover:bg-gray-100">Orders</Link>
                     <Link to="/account/profile" className="block px-4 py-1 hover:bg-gray-100">Profile</Link>
                     <Link to="/account/lists" className="block px-4 py-1 hover:bg-gray-100">Lists</Link>
-                    <button onClick={logout} className="w-full text-left px-4 py-1 hover:bg-gray-100">
+                    <button onClick={logout} className="w-full text-left px-4 py-1 hover:bg-gray-100 border-t border-gray-100 mt-1">
                       Sign out
                     </button>
                   </>

@@ -1,6 +1,8 @@
 
 from models.users import User
 from schema.users import UserRegister, UserSchema
+from utils.security import hash_password
+
 
 class UserCRUD:
     def __init__(self):
@@ -19,7 +21,10 @@ class UserCRUD:
         return User.get_all_users()
     
     def create_user(self, user: UserRegister):
-        db_user = User(**user.dict())
+        # Hash the password before saving
+        user_data = user.dict()
+        user_data['password'] = hash_password(user_data['password'])
+        db_user = User(**user_data)
         return User.create_user(db_user)
 
     def update_user(self, user_id: int, user_schema: UserSchema):

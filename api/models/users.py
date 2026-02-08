@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String
-from .database import Base, SessionLocal
+from sqlalchemy.orm import relationship
+from .database import Base, SessionLocal        
 
 class User(Base):
     __tablename__ = "users"
@@ -8,16 +9,21 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     password = Column(String)
     phone = Column(String, nullable=True)
+    user_type = Column(String, nullable=True)
+    addresses = relationship("Address", back_populates="user")
+    products = relationship("Product", back_populates="seller")
+
 
     def __repr__(self):
         return f"<User(id={self.id}, username='{self.username}', email='{self.email}')>"
     
     def to_dict(self):
         return {
-            "id": self.id,
+            "id": self.id, 
             "username": self.username,
             "email": self.email,
-            "password": self.password
+            "user_type": self.user_type,
+            "phone": self.phone
         }
     
     def get_user_by_username(username: str):
@@ -43,15 +49,23 @@ class User(Base):
         db.refresh(user)
         return user
     
-    def update_user(user):
+    @staticmethod
+    def update_user(user_id: int, user_schema):
         db = SessionLocal()
-        db.commit()
-        db.refresh(user)
+        user = db.query(User).filter_by(id=user_id).first()
+        if user:
+            for key, value in user_schema.dict(exclude_unset=True).items():
+                setattr(user, key, value)
+            db.commit()
+            db.refresh(user)
         return user
-    
-    def delete_user(user):
+
+    @staticmethod
+    def delete_user(user_id: int):
         db = SessionLocal()
-        db.delete(user)
-        db.commit()
+        user = db.query(User).filter_by(id=user_id).first()
+        if user:
+            db.delete(user)
+            db.commit()
         return user
     

@@ -47,11 +47,18 @@ export function LoginPage() {
           Sign in
         </button>
       </form>
-      <p className="mt-2 text-sm text-gray-500">API: POST /api/auth/login { '{ email, password }' }</p>
+      <p className="mt-2 text-sm text-gray-500">API: POST /api/auth/login {'{ email, password }'}</p>
       <Link to="/forgot-password" className="block mt-2 text-sm text-amazon-orange hover:underline">Forgot password?</Link>
-      <p className="mt-4 text-sm">
+      <p className="mt-4 text-sm text-center">
         New? <Link to="/register" className="text-amazon-orange hover:underline">Create an account</Link>
       </p>
+
+      <div className="mt-8 border-t pt-4">
+        <h2 className="text-sm font-semibold text-gray-700">Want to sell on Amazon?</h2>
+        <Link to="/seller/login" className="block mt-1 text-sm text-blue-600 hover:text-orange-700 hover:underline">
+          Go to Seller Central
+        </Link>
+      </div>
     </div>
   );
 }

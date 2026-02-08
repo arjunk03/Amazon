@@ -7,33 +7,43 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const savings = product.listPrice && product.listPrice > product.price
-    ? Math.round(((product.listPrice - product.price) / product.listPrice) * 100)
+  // Support both unified and legacy field names for compatibility
+  const p = product as any;
+  const imageUrl = p.imageUrl || p.image || '';
+  const title = p.title || p.name || '';
+
+  const savings = p.listPrice && p.listPrice > p.price
+    ? Math.round(((p.listPrice - p.price) / p.listPrice) * 100)
     : 0;
 
   return (
     <Link
-      to={`/product/${product.id}`}
-      className="block border border-gray-200 rounded p-4 bg-white hover:shadow-md transition-shadow"
+      to={`/product/${p.id}`}
+      className="group block bg-white border border-gray-200 rounded p-4 hover:shadow-lg transition-shadow"
     >
-      <div className="aspect-square bg-gray-100 rounded flex items-center justify-center overflow-hidden">
+      <div className="aspect-square mb-3 overflow-hidden">
         <img
-          src={product.imageUrl}
-          alt={product.title}
-          className="w-full h-full object-contain"
-          onError={(e) => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23ddd" width="100" height="100"/><text x="50%" y="50%" fill="%23999" text-anchor="middle" dy=".3em">No image</text></svg>'; }}
+          src={imageUrl}
+          alt={title}
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = 'https://placehold.co/400x400/f0f0f0/999999?text=Image+Not+Found';
+          }}
         />
       </div>
-      <h3 className="mt-2 text-sm font-medium line-clamp-2">{product.title}</h3>
-      {product.rating != null && (
+      <h3 className="text-sm font-medium line-clamp-2 h-10 group-hover:text-amazon-orange">
+        {title}
+      </h3>
+      {p.rating != null && (
         <p className="text-amber-600 text-sm mt-1">
-          ★ {product.rating} {product.reviewCount != null && `(${product.reviewCount})`}
+          ★ {p.rating} {p.reviewCount != null && `(${p.reviewCount})`}
         </p>
       )}
       <div className="mt-1 flex items-baseline gap-2">
-        <span className="text-amazon-orange font-semibold">${product.price.toFixed(2)}</span>
+        <span className="text-amazon-orange font-semibold">₹{product.price.toFixed(2)}</span>
         {product.listPrice != null && product.listPrice > product.price && (
-          <span className="text-gray-500 text-sm line-through">${product.listPrice.toFixed(2)}</span>
+          <span className="text-gray-500 text-sm line-through">₹{product.listPrice.toFixed(2)}</span>
         )}
         {savings > 0 && <span className="text-green-600 text-sm">-{savings}%</span>}
       </div>

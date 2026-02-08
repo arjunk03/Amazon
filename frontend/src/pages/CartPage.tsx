@@ -31,7 +31,7 @@ export function CartPage() {
               <img src={item.imageUrl} alt={item.title} className="w-24 h-24 object-contain bg-gray-100 rounded" />
               <div className="flex-1">
                 <Link to={`/product/${item.productId}`} className="font-medium hover:text-amazon-orange">{item.title}</Link>
-                <p className="text-amazon-orange font-semibold mt-1">${item.price.toFixed(2)}</p>
+                <p className="text-amazon-orange font-semibold mt-1">₹{item.price.toFixed(2)}</p>
                 <div className="flex items-center gap-2 mt-2">
                   <select
                     className="border rounded px-2 py-1 text-sm"
@@ -58,13 +58,13 @@ export function CartPage() {
                   <span className="text-sm text-gray-500">Save for later — POST move-to-list</span>
                 </div>
               </div>
-              <div className="font-semibold">${(item.price * item.quantity).toFixed(2)}</div>
+              <div className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</div>
             </div>
           ))}
         </div>
         <div className="md:w-80 shrink-0 bg-gray-50 rounded p-4 h-fit">
           <p className="text-sm text-gray-600">
-            Subtotal ({cart.itemCount} item{cart.itemCount !== 1 ? 's' : ''}): <span className="font-semibold">${cart.subtotal.toFixed(2)}</span>
+            Subtotal ({cart.itemCount} item{cart.itemCount !== 1 ? 's' : ''}): <span className="font-semibold">₹{cart.subtotal.toFixed(2)}</span>
           </p>
           <Link
             to="/checkout"

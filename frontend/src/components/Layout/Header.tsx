@@ -24,10 +24,12 @@ export function Header() {
           amazon
         </Link>
 
-        <div className="flex items-start gap-1 text-sm text-gray-300">
-          <span className="text-xs">Deliver to</span>
-          <span className="font-semibold text-white">{mockDeliveryLocation.label}</span>
-        </div>
+        {user?.user_type !== 'seller' && (
+          <div className="flex items-start gap-1 text-sm text-gray-300">
+            <span className="text-xs">Deliver to</span>
+            <span className="font-semibold text-white">{mockDeliveryLocation.label}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSearch} className="flex-1 flex max-w-[600px]">
           <input
@@ -58,14 +60,17 @@ export function Header() {
                     <div className="px-4 py-2 border-b border-gray-100 mb-1">
                       <p className="font-bold text-sm">Your Account</p>
                     </div>
-                    {user.user_type === 'seller' && (
+                    {user.user_type === 'seller' ? (
                       <Link to="/seller/dashboard" className="block px-4 py-1 hover:bg-gray-100 text-amazon-orange font-semibold">
                         Seller Dashboard
                       </Link>
+                    ) : (
+                      <>
+                        <Link to="/account/orders" className="block px-4 py-1 hover:bg-gray-100">Orders</Link>
+                        <Link to="/account/lists" className="block px-4 py-1 hover:bg-gray-100">Lists</Link>
+                      </>
                     )}
-                    <Link to="/account/orders" className="block px-4 py-1 hover:bg-gray-100">Orders</Link>
                     <Link to="/account/profile" className="block px-4 py-1 hover:bg-gray-100">Profile</Link>
-                    <Link to="/account/lists" className="block px-4 py-1 hover:bg-gray-100">Lists</Link>
                     <button onClick={logout} className="w-full text-left px-4 py-1 hover:bg-gray-100 border-t border-gray-100 mt-1">
                       Sign out
                     </button>
@@ -82,22 +87,48 @@ export function Header() {
             )}
           </div>
 
-          <Link to="/account/orders" className="text-sm whitespace-nowrap">Returns & Orders</Link>
+          {user?.user_type !== 'seller' && (
+            <>
+              <Link to="/account/orders" className="text-sm whitespace-nowrap">Returns & Orders</Link>
 
-          <Link to="/cart" className="flex items-end gap-0">
-            <span className="text-2xl">🛒</span>
-            <span className="text-amazon-orange font-bold">{cart.itemCount}</span>
-            <span className="text-sm">Cart</span>
-          </Link>
+              <Link to="/cart" className="flex items-end gap-0">
+                <span className="text-2xl">🛒</span>
+                <span className="text-amazon-orange font-bold">{cart.itemCount}</span>
+                <span className="text-sm">Cart</span>
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
-      <nav className="bg-amazon-dark-light px-4 py-1 flex items-center gap-4 text-sm">
-        <Link to="/" className="hover:text-amazon-nav-hover">All</Link>
-        <Link to="/search?category=deals" className="hover:text-amazon-nav-hover">Today's Deals</Link>
-        <Link to="/customer-service" className="hover:text-amazon-nav-hover cursor-pointer">Customer Service</Link>
-        <Link to="/registry" className="hover:text-amazon-nav-hover cursor-pointer">Registry</Link>
-        <Link to="/gift-cards" className="hover:text-amazon-nav-hover cursor-pointer">Gift Cards</Link>
+      <nav className="bg-amazon-dark-light px-4 py-1 flex items-center gap-4 text-sm whitespace-nowrap overflow-x-auto no-scrollbar">
+        <Link to="/" className="hover:text-amazon-nav-hover flex items-center gap-1 font-bold border border-transparent hover:border-white px-2 py-1">
+          <span className="text-lg">☰</span> All
+        </Link>
+        {user?.user_type === 'seller' ? (
+          <>
+            <Link to="/seller/dashboard" className="hover:text-amazon-nav-hover border border-transparent hover:border-white px-2 py-1">Inventory</Link>
+            <Link to="/seller/add-product" className="hover:text-amazon-nav-hover border border-transparent hover:border-white px-2 py-1">Add a Product</Link>
+          </>
+        ) : (
+          <>
+            <Link to="/search?category=deals" className="hover:text-amazon-nav-hover border border-transparent hover:border-white px-2 py-1">Today's Deals</Link>
+            <Link to="/registry" className="hover:text-amazon-nav-hover border border-transparent hover:border-white px-2 py-1">Registry</Link>
+            <Link to="/gift-cards" className="hover:text-amazon-nav-hover border border-transparent hover:border-white px-2 py-1">Gift Cards</Link>
+            <Link to="/seller/register" className="hover:text-amazon-nav-hover border border-transparent hover:border-white px-2 py-1">Sell</Link>
+          </>
+        )}
+
+        <Link to="/customer-service" className="hover:text-amazon-nav-hover border border-transparent hover:border-white px-2 py-1">Customer Service</Link>
+
+        {user?.user_type === 'seller' && (
+          <Link
+            to="/seller/dashboard"
+            className="text-amazon-orange font-bold hover:text-white border border-transparent hover:border-white px-2 py-1 ml-auto"
+          >
+            Seller Central
+          </Link>
+        )}
       </nav>
     </header>
   );

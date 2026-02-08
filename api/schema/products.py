@@ -1,10 +1,13 @@
 from pydantic import BaseModel
 
-class ProductSchema(BaseModel):
-    id: int
-    name: str
+class ProductCreate(BaseModel):
+    title: str
     description: str
     price: int
-    image: str
+    imageUrl: str
+    category: str
     seller_id: int
+
+class ProductSchema(ProductCreate):
+    id: int
 

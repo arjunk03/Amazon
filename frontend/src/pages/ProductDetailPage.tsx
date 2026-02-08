@@ -1,21 +1,37 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
-import { getProductById } from '../mock/data';
+import { productsApi } from '../services/api/products.api';
+import type { Product } from '../types/product';
 
 /**
- * Product from GET /api/products/:id
- * Reviews from GET /api/products/:id/reviews
+ * Product detail page using live API.
  */
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addItem } = useCart();
   const { addToast } = useToast();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const [quantity, setQuantity] = useState(1);
 
-  const product = id ? getProductById(id) : undefined;
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!id) return;
+      try {
+        const data = await productsApi.getById(parseInt(id));
+        setProduct(data);
+      } catch (err) {
+        setError('Product not found');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
 
   const handleAddToCart = () => {
     if (!id) return;
@@ -29,68 +45,107 @@ export function ProductDetailPage() {
     navigate('/cart');
   };
 
-  if (!id) {
-    return <div className="p-4">Invalid product ID</div>;
+  if (isLoading) {
+    return <div className="max-w-[1200px] mx-auto p-12 text-center text-gray-500">Loading product details...</div>;
   }
 
-  if (!product) {
+  if (error || !product) {
     return (
-      <div className="max-w-[1200px] mx-auto p-8 text-center">
-        <h1 className="text-xl font-semibold">Product not found</h1>
-        <p className="text-gray-500 mt-2">No product with ID &quot;{id}&quot;.</p>
+      <div className="max-w-[1200px] mx-auto p-12 text-center">
+        <h1 className="text-2xl font-bold text-gray-800">Product not found</h1>
+        <p className="text-gray-500 mt-4">We couldn't find the product you're looking for.</p>
+        <button
+          onClick={() => navigate('/')}
+          className="mt-6 text-amazon-orange hover:underline font-medium"
+        >
+          Return to Home
+        </button>
       </div>
     );
   }
 
-  const savings = product.listPrice && product.listPrice > product.price
-    ? Math.round(((product.listPrice - product.price) / product.listPrice) * 100)
+  // Support listPrice if present in any
+  const p = product as any;
+  const listPrice = p.listPrice || 0;
+  const savings = listPrice > product.price
+    ? Math.round(((listPrice - product.price) / listPrice) * 100)
     : 0;
 
   return (
-    <div className="max-w-[1200px] mx-auto p-4">
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="aspect-square bg-gray-100 rounded overflow-hidden flex items-center justify-center">
-          <img src={product.images[0] ?? product.imageUrl} alt={product.title} className="w-full h-full object-contain" />
+    <div className="max-w-[1200px] mx-auto p-6">
+      <div className="grid md:grid-cols-2 gap-12">
+        <div className="aspect-square bg-white border border-gray-200 rounded-lg overflow-hidden flex items-center justify-center p-8 shadow-sm">
+          <img
+            src={product.imageUrl}
+            alt={product.title}
+            className="w-full h-full object-contain"
+          />
         </div>
-        <div>
-          <h1 className="text-xl font-semibold">{product.title}</h1>
-          {product.rating != null && (
-            <p className="text-amber-600 text-sm mt-1">
-              ★ {product.rating} {product.reviewCount != null && `(${product.reviewCount} reviews)`}
-            </p>
-          )}
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-amazon-orange font-semibold text-lg">${product.price.toFixed(2)}</span>
-            {product.listPrice != null && <span className="text-gray-500 line-through">${product.listPrice.toFixed(2)}</span>}
-            {savings > 0 && <span className="text-green-600 text-sm">-{savings}%</span>}
+
+        <div className="space-y-6">
+          <div className="border-b pb-4">
+            <h1 className="text-2xl font-medium text-gray-900 leading-tight">{product.title}</h1>
+            <p className="text-sm text-amazon-orange font-medium mt-1">Brand: {p.brand || 'Generic'}</p>
           </div>
-          <p className="mt-2 text-sm">{product.inStock ? (product.stockQuantity != null ? `Only ${product.stockQuantity} left` : 'In Stock') : 'Out of Stock'}</p>
-          {product.deliveryEta && <p className="text-sm text-green-700 mt-1">Delivery: {product.deliveryEta}</p>}
-          <div className="mt-4 flex gap-2">
-            <label className="text-sm">Qty:</label>
-            <select value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} className="border rounded px-2 py-1">
-              {Array.from({ length: Math.min(10, product.stockQuantity ?? 10) }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
+
+          <div className="border-b pb-4">
+            <div className="flex items-center gap-4">
+              <div className="flex items-baseline gap-1">
+                <span className="text-sm align-top mt-1">₹</span>
+                <span className="text-3xl font-medium">{product.price.toLocaleString()}</span>
+              </div>
+              {listPrice > product.price && (
+                <div className="text-sm text-gray-500 flex flex-col">
+                  <span>M.R.P: <span className="line-through">₹{listPrice.toLocaleString()}</span></span>
+                  <span className="text-red-700">Save ₹{(listPrice - product.price).toLocaleString()} ({savings}%)</span>
+                </div>
+              )}
+            </div>
+            <p className="text-sm text-gray-600 mt-2">Inclusive of all taxes</p>
           </div>
-          <div className="mt-4 flex gap-2">
-            <button onClick={handleAddToCart} className="bg-amazon-orange text-amazon-dark px-4 py-2 rounded hover:bg-amber-500">
-              Add to Cart
-            </button>
-            <button onClick={handleBuyNow} className="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700">
-              Buy Now
-            </button>
+
+          <div className="space-y-4">
+            <div className="text-sm">
+              <span className={`font-bold ${p.inStock !== false ? 'text-green-700' : 'text-red-700'}`}>
+                {p.inStock !== false ? 'In Stock' : 'Out of Stock'}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <label className="text-sm font-bold">Quantity:</label>
+              <select
+                value={quantity}
+                onChange={(e) => setQuantity(Number(e.target.value))}
+                className="border rounded-md px-3 py-1 bg-gray-50 outline-none focus:border-amazon-orange shadow-sm"
+              >
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 pt-2">
+              <button
+                onClick={handleAddToCart}
+                className="w-full h-[40px] bg-amber-400 hover:bg-amber-500 rounded-full font-medium transition-colors shadow-sm"
+              >
+                Add to Cart
+              </button>
+              <button
+                onClick={handleBuyNow}
+                className="w-full h-[40px] bg-amazon-orange hover:bg-amber-600 rounded-full font-medium transition-colors shadow-sm"
+              >
+                Buy Now
+              </button>
+            </div>
           </div>
-          <button type="button" className="mt-2 text-sm text-amazon-orange hover:underline">Add to Wishlist</button>
-          <section className="mt-8 border-t pt-4">
-            <h2 className="font-semibold">About this item</h2>
-            <p className="text-sm mt-1">{product.description}</p>
-          </section>
-          <section className="mt-6">
-            <h2 className="font-semibold">Customer reviews</h2>
-            <p className="text-sm text-gray-500">{(product.reviewCount ?? 0)} reviews · Write a review</p>
-          </section>
+
+          <div className="border-t pt-6">
+            <h2 className="text-lg font-bold mb-3">About this item</h2>
+            <div className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
+              {product.description}
+            </div>
+          </div>
         </div>
       </div>
     </div>

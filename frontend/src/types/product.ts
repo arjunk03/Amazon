@@ -4,17 +4,19 @@
 
 export interface Product {
     id: number;
-    name: string;
+    title: string;
     description: string;
     price: number;
-    image: string;
+    imageUrl: string;
+    category: string;
     seller_id: number;
 }
 
 export interface ProductCreateRequest {
-    name: string;
+    title: string;
     description: string;
     price: number;
-    image: string;
+    imageUrl: string;
+    category: string;
     seller_id: number;
 }

@@ -22,6 +22,13 @@ export const productsApi = {
     },
 
     /**
+     * Get product categories
+     */
+    getCategories: async (): Promise<string[]> => {
+        return apiClient.get<string[]>(API_ENDPOINTS.PRODUCT_CATEGORIES);
+    },
+
+    /**
      * Create a new product
      */
     create: async (data: ProductCreateRequest): Promise<Product> => {

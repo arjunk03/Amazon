@@ -91,7 +91,7 @@ export function CheckoutPage() {
       {step === 3 && (
         <section className="border rounded p-4">
           <h2 className="font-semibold mb-2">Review order</h2>
-          <p className="text-sm text-gray-600">Subtotal ({cart.itemCount} items): ${cart.subtotal.toFixed(2)}</p>
+          <p className="text-sm text-gray-600">Subtotal ({cart.itemCount} items): ₹{cart.subtotal.toFixed(2)}</p>
           <p className="text-sm mt-1">Shipping to: {addresses.find((a) => a.id === addressId)?.city}, {addresses.find((a) => a.id === addressId)?.stateOrRegion}</p>
           <p className="text-sm mt-1">Payment: {paymentMethods.find((p) => p.id === paymentMethodId)?.brand} ****{paymentMethods.find((p) => p.id === paymentMethodId)?.last4}</p>
           <button type="button" onClick={handlePlaceOrder} className="mt-4 bg-amazon-orange text-amazon-dark px-6 py-2 rounded font-semibold">

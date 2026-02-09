@@ -1,13 +1,16 @@
 from models.users import User
-from schema.auth import LoginRequest, LoginResponse
+from schema.auth import LoginRequest, LoginResponse, Token
 from utils.security import verify_password
-
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
+from oauth2 import create_access_token
+from fastapi import Depends
+from dependency import get_db
 
 class AuthCRUD:
     def __init__(self):
         pass
 
-    def authenticate_user(self, login_data: LoginRequest) -> LoginResponse:
+    def authenticate_user(self, login_data: OAuth2PasswordRequestForm = Depends(), db=Depends(get_db)) -> LoginResponse:
         """
         Authenticate a user by verifying their username and password.
 
@@ -18,9 +21,9 @@ class AuthCRUD:
             LoginResponse with authentication result
         """
         # Get user by username
-        user = User.get_user_by_email(login_data.email)
+        user = User.get_user_by_email(login_data.email, db)
         if not user:
-            return LoginResponse(
+            return Token(
                 success=False,
                 message="Invalid username or password",
                 user=None,
@@ -29,7 +32,7 @@ class AuthCRUD:
 
         # Verify password
         if not verify_password(login_data.password, user.password):
-            return LoginResponse(
+            return Token(
                 success=False,
                 message="Invalid username or password",
                 user=None,
@@ -47,9 +50,12 @@ class AuthCRUD:
             phone=user.phone
         )
 
-        return LoginResponse(
+        access_token = create_access_token(data={"sub": user.email})
+
+        return Token(
             success=True,
             message="Login successful",
             user=user_schema,
-            token="placeholder-token"
+            token=access_token,
+            token_type="bearer"
         )

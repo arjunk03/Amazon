@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
-from .database import Base, SessionLocal
+from .database import Base
 from sqlalchemy.orm import relationship
 
 class Product(Base):
@@ -28,42 +28,36 @@ class Product(Base):
         }
     
     @staticmethod
-    def get_product_by_id(id: int):
-        with SessionLocal() as db:
-            return db.query(Product).filter_by(id=id).first()
+    def get_product_by_id(id: int, db):
+        return db.query(Product).filter_by(id=id).first()
     
     @staticmethod
-    def get_all_products():
-        with SessionLocal() as db:
-            return db.query(Product).all()
+    def get_all_products(db):
+        return db.query(Product).all()
     
     @staticmethod
-    def create_product(product):
-        with SessionLocal() as db:
+    def create_product(product, db):
             db.add(product)
             db.commit()
             db.refresh(product)
             return product
     
     @staticmethod
-    def update_product(product):
-        with SessionLocal() as db:
-            merged_product = db.merge(product) # Use merge to handle objects from different sessions
-            db.commit()
-            db.refresh(merged_product)
-            return merged_product
+    def update_product(product, db):
+        merged_product = db.merge(product) # Use merge to handle objects from different sessions
+        db.commit()
+        db.refresh(merged_product)
+        return merged_product
     
     @staticmethod
-    def delete_product(product):
-        with SessionLocal() as db:
-            product = db.merge(product)
-            db.delete(product)
-            db.commit()
-            return product
+    def delete_product(product, db):
+        product = db.merge(product)
+        db.delete(product)
+        db.commit()
+        return product
 
     @staticmethod
-    def get_unique_categories():
-        with SessionLocal() as db:
-            # Query unique categories, filtering out None/Empty
-            results = db.query(Product.category).distinct().all()
-            return [r[0] for r in results if r[0]]
+    def get_unique_categories(db):
+        # Query unique categories, filtering out None/Empty
+        results = db.query(Product.category).distinct().all()
+        return [r[0] for r in results if r[0]]

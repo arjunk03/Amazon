@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
-from .database import Base, SessionLocal        
+from .database import Base        
 
 class User(Base):
     __tablename__ = "users"
@@ -27,50 +27,43 @@ class User(Base):
         }
     
     @staticmethod
-    def get_user_by_username(username: str):
-        with SessionLocal() as db:
-            return db.query(User).filter_by(username=username).first()
+    def get_user_by_username(username: str, db):
+        return db.query(User).filter_by(username=username).first()
     
     @staticmethod
-    def get_user_by_email(email: str):
-        with SessionLocal() as db:
-            return db.query(User).filter_by(email=email).first()
+    def get_user_by_email(email: str, db):
+        return db.query(User).filter_by(email=email).first()
     
     @staticmethod
-    def get_user_by_id(id: int):
-        with SessionLocal() as db:
-            return db.query(User).filter_by(id=id).first()
+    def get_user_by_id(id: int, db):
+        return db.query(User).filter_by(id=id).first()
     
     @staticmethod
-    def get_all_users():
-        with SessionLocal() as db:
-            return db.query(User).all()
+    def get_all_users(db):
+        return db.query(User).all()
     
     @staticmethod
-    def create_user(user):
-        with SessionLocal() as db:
-            db.add(user)
+    def create_user(user, db):
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        return user
+    
+    @staticmethod
+    def update_user(user_id: int, user_schema, db):
+        user = db.query(User).filter_by(id=user_id).first()
+        if user:
+            for key, value in user_schema.dict(exclude_unset=True).items():
+                setattr(user, key, value)
             db.commit()
             db.refresh(user)
             return user
-    
-    @staticmethod
-    def update_user(user_id: int, user_schema):
-        with SessionLocal() as db:
-            user = db.query(User).filter_by(id=user_id).first()
-            if user:
-                for key, value in user_schema.dict(exclude_unset=True).items():
-                    setattr(user, key, value)
-                db.commit()
-                db.refresh(user)
-            return user
 
     @staticmethod
-    def delete_user(user_id: int):
-        with SessionLocal() as db:
-            user = db.query(User).filter_by(id=user_id).first()
-            if user:
-                db.delete(user)
-                db.commit()
+    def delete_user(user_id: int, db):
+        user = db.query(User).filter_by(id=user_id).first()
+        if user:
+            db.delete(user)
+            db.commit()
             return user
     

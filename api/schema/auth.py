@@ -11,3 +11,9 @@ class LoginResponse(BaseModel):
     message: str
     user: UserSchema | None = None
     token: str | None = None
+
+class Token(LoginResponse):
+    token_type: str | None = None
+
+class TokenData(BaseModel):
+    email: str | None = None

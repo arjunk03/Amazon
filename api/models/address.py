@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
-from .database import Base, SessionLocal
+from .database import Base
+
 
 class Address(Base):
     __tablename__ = "addresses"
@@ -31,29 +32,29 @@ class Address(Base):
             "country": self.country
         }
     
-    def get_address_by_id(id: int):
-        db = SessionLocal()
+    @staticmethod
+    def get_address_by_id(id: int, db):
         return db.query(Address).filter_by(id=id).first()
     
-    def get_all_addresses():
-        db = SessionLocal()
-        return db.query(Address).all()
+    @staticmethod
+    def get_all_addresses(db):
+            return db.query(Address).all()
     
-    def create_address(address):
-        db = SessionLocal()
+    @staticmethod
+    def create_address(address, db):
         db.add(address)
         db.commit()
         db.refresh(address)
         return address
     
-    def update_address(address):
-        db = SessionLocal()
+    @staticmethod
+    def update_address(address, db):
         db.commit()
         db.refresh(address)
         return address
     
-    def delete_address(address):
-        db = SessionLocal()
+    @staticmethod
+    def delete_address(address, db):
         db.delete(address)
         db.commit()
         return address

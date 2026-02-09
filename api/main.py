@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers.users import user_router
 from routers.products import product_router
 
+from routers.auth import auth_router
+
 from models.database import init_db
 
 app = FastAPI()
@@ -27,4 +29,5 @@ def read_root():
 
 app.include_router(user_router, prefix="/users", tags=["users"])
 app.include_router(product_router, prefix="/products", tags=["products"])
+app.include_router(auth_router, prefix="/auth", tags=["auth"])
 

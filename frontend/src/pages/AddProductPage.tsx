@@ -1,9 +1,12 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { productsApi } from '../services/api/products.api';
 import { useAuth } from '../context/AuthContext';
 
 export function AddProductPage() {
+    const { id } = useParams<{ id: string }>();
+    const isEditMode = !!id;
+
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState('');
@@ -14,6 +17,27 @@ export function AddProductPage() {
 
     const { user } = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isEditMode && id) {
+            const fetchProduct = async () => {
+                try {
+                    setIsLoading(true);
+                    const product = await productsApi.getById(parseInt(id));
+                    setTitle(product.title);
+                    setDescription(product.description);
+                    setPrice(product.price.toString());
+                    setImageUrl(product.imageUrl);
+                    setCategory(product.category);
+                } catch (err) {
+                    setError('Failed to load product for editing');
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+            fetchProduct();
+        }
+    }, [id, isEditMode]);
 
     const categories = [
         'Electronics',
@@ -38,17 +62,23 @@ export function AddProductPage() {
         setError('');
 
         try {
-            await productsApi.create({
+            const productData = {
                 title,
                 description,
                 price: parseInt(price),
                 imageUrl,
                 category,
                 seller_id: user.id
-            });
+            };
+
+            if (isEditMode && id) {
+                await productsApi.update(parseInt(id), productData);
+            } else {
+                await productsApi.create(productData);
+            }
             navigate('/seller/dashboard');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to add product');
+            setError(err instanceof Error ? err.message : 'Failed to save product');
         } finally {
             setIsLoading(false);
         }
@@ -56,7 +86,7 @@ export function AddProductPage() {
 
     return (
         <div className="max-w-2xl mx-auto p-6">
-            <h1 className="text-2xl font-bold mb-6">Add New Product</h1>
+            <h1 className="text-2xl font-bold mb-6">{isEditMode ? 'Edit Product' : 'Add New Product'}</h1>
 
             <form onSubmit={handleSubmit} className="bg-white border rounded-lg p-6 shadow-sm space-y-6">
                 <div>
@@ -181,7 +211,7 @@ export function AddProductPage() {
                         disabled={isLoading}
                         className={`flex-1 bg-amazon-orange text-white py-3 rounded font-medium hover:bg-amber-500 ${isLoading ? 'opacity-50' : ''}`}
                     >
-                        {isLoading ? 'Creating...' : 'List Product'}
+                        {isLoading ? 'Saving...' : (isEditMode ? 'Save Changes' : 'List Product')}
                     </button>
                 </div>
             </form>

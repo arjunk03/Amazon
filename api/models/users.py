@@ -26,22 +26,27 @@ class User(Base):
             "phone": self.phone
         }
     
+    @staticmethod
     def get_user_by_username(username: str):
         with SessionLocal() as db:
             return db.query(User).filter_by(username=username).first()
     
+    @staticmethod
     def get_user_by_email(email: str):
         with SessionLocal() as db:
             return db.query(User).filter_by(email=email).first()
     
+    @staticmethod
     def get_user_by_id(id: int):
         with SessionLocal() as db:
             return db.query(User).filter_by(id=id).first()
     
+    @staticmethod
     def get_all_users():
         with SessionLocal() as db:
             return db.query(User).all()
     
+    @staticmethod
     def create_user(user):
         with SessionLocal() as db:
             db.add(user)

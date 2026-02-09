@@ -100,7 +100,12 @@ export function SellerDashboard() {
                                                 <td className="px-6 py-4 font-bold text-lg text-amazon-dark">₹{product.price}</td>
                                                 <td className="px-6 py-4 text-gray-500 text-xs">#{product.id}</td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <button className="text-blue-600 hover:text-blue-800 font-medium mr-4 transition-colors">Edit</button>
+                                                    <Link
+                                                        to={`/seller/edit-product/${product.id}`}
+                                                        className="text-blue-600 hover:text-blue-800 font-medium mr-4 transition-colors"
+                                                    >
+                                                        Edit
+                                                    </Link>
                                                     <button className="text-red-600 hover:text-red-800 font-medium transition-colors">Delete</button>
                                                 </td>
                                             </tr>

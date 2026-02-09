@@ -27,14 +27,17 @@ class Product(Base):
             "seller_id": self.seller_id
         }
     
+    @staticmethod
     def get_product_by_id(id: int):
         with SessionLocal() as db:
             return db.query(Product).filter_by(id=id).first()
     
+    @staticmethod
     def get_all_products():
         with SessionLocal() as db:
             return db.query(Product).all()
     
+    @staticmethod
     def create_product(product):
         with SessionLocal() as db:
             db.add(product)
@@ -42,13 +45,15 @@ class Product(Base):
             db.refresh(product)
             return product
     
+    @staticmethod
     def update_product(product):
         with SessionLocal() as db:
-            db.merge(product) # Use merge to handle objects from different sessions
+            merged_product = db.merge(product) # Use merge to handle objects from different sessions
             db.commit()
-            db.refresh(product)
-            return product
+            db.refresh(merged_product)
+            return merged_product
     
+    @staticmethod
     def delete_product(product):
         with SessionLocal() as db:
             product = db.merge(product)

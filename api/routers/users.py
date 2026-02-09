@@ -7,10 +7,10 @@ from schema.auth import LoginRequest, LoginResponse
 user_router = APIRouter()
 
 
-@user_router.post("/login", response_model=LoginResponse)
-def login(login_data: LoginRequest):
-    """Authenticate a user with username and password"""
-    return AuthCRUD().authenticate_user(login_data)
+# @user_router.post("/login", response_model=LoginResponse)
+# def login(login_data: LoginRequest):
+#     """Authenticate a user with username and password"""
+#     return AuthCRUD().authenticate_user(login_data)
 
 
 @user_router.get("/", response_model=list[UserSchema])

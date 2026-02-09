@@ -18,8 +18,7 @@ class AuthCRUD:
             LoginResponse with authentication result
         """
         # Get user by username
-        user = User.get_user_by_username(login_data.username)
-
+        user = User.get_user_by_email(login_data.email)
         if not user:
             return LoginResponse(
                 success=False,

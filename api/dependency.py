@@ -1,10 +1,8 @@
-from typing import Annotated
-from fastapi import Depends
-from sqlmodel import Session
-from database.setup import engine
+from database.setup import SessionLocal
 
 def get_db():
-    with Session(engine) as session:
-        yield session
-
-SessionDep = Annotated[Session, Depends(get_db)]
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

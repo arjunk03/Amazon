@@ -3,12 +3,14 @@ from .schema import LoginRequest, Token, LoginResponse
 from utils.security import verify_password
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from oauth2 import create_access_token
+from fastapi import Depends
+from dependency import get_db
 
 class AuthCRUD:
     def __init__(self):
         pass
 
-    def authenticate_user(self, login_data: OAuth2PasswordRequestForm, db) -> LoginResponse:
+    def authenticate_user(self, login_data: OAuth2PasswordRequestForm = Depends(), db=Depends(get_db)) -> LoginResponse:
         """
         Authenticate a user by verifying their username and password.
 

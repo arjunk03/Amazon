@@ -23,10 +23,10 @@ import os
 import sys
 sys.path.append(os.getcwd())
 
-from models.database import Base, db_user, db_passwd, db_name
-from models.users import User  # explicit import to register model
-from models.address import Address
-from models.products import Product
+from database.setup import Base, db_user, db_passwd, db_name
+from users.model import User
+from address.model import Address
+from products.model import Product
 
 target_metadata = Base.metadata
 

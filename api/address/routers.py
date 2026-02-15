@@ -8,28 +8,28 @@ address_router = APIRouter(prefix="/addresses", tags=["addresses"])
 address_crud = AddressCRUD()    
 
 @address_router.get("/", response_model=list[AddressSchema])
-def get_addresses(db=Depends(get_db)):
-    return address_crud.get_all_addresses(db)
+async def get_addresses(db=Depends(get_db)):
+    return await address_crud.get_all_addresses(db)
 
 @address_router.get("/{id}", response_model=AddressSchema)
-def get_address(id: int, db=Depends(get_db)):
-    return address_crud.get_address_by_id(id, db)
+async def get_address(id: int, db=Depends(get_db)):
+    return await address_crud.get_address_by_id(id, db)
 
 @address_router.post("/", response_model=AddressSchema)
-def create_address(address: AddressCreate, db=Depends(get_db)):
-    address = address_crud.create_address(address, db)
+async def create_address(address: AddressCreate, db=Depends(get_db)):
+    address = await address_crud.create_address(address, db)
     db.commit()
     return address
 
 
 @address_router.put("/{id}", response_model=AddressSchema)
-def update_address(id: int, address: AddressCreate, db=Depends(get_db)):
-    address = address_crud.update_address(id, address, db)
+async def update_address(id: int, address: AddressCreate, db=Depends(get_db)):
+    address = await address_crud.update_address(id, address, db)
     db.commit()
     return address
 
 @address_router.delete("/{id}", response_model=AddressSchema)
-def delete_address(id: int, db=Depends(get_db)):
-    address = address_crud.delete_address(id, db)
+async def delete_address(id: int, db=Depends(get_db)):
+    address = await address_crud.delete_address(id, db)
     db.commit()
     return address

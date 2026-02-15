@@ -6,6 +6,8 @@ from dependency import get_db
 from fastapi import Depends 
 from users.model import User
 from config import settings
+from redis_app.redis import is_token_blocked
+from utils.errors import Unauthorized, UserNotFound
 
 
 OPENSSL_KEY = settings.OPENSSL_KEY
@@ -15,40 +17,44 @@ ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
-def create_access_token(data: dict):
+async def create_access_token(data: dict, refresh: bool = False):
     to_encode = data.copy()
 
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp" : expire})
+    if refresh:
+        expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    
+    to_encode.update({"exp" : expire, "refresh": refresh})
 
     encoded_jwt = jwt.encode(to_encode, OPENSSL_KEY, algorithm=ALGORITHM)
-
+    
     return encoded_jwt
 
-def verify_token(token: str, credentials_exception):
+
+async def verify_token(token: str):
     try:
         payload = jwt.decode(token, OPENSSL_KEY, algorithms=[ALGORITHM])
  
         email: str = payload.get("sub")
-        print("verify_token : ", email)
         if email is None:
-            raise credentials_exception
+            return None            
 
         return email
     except JWTError:
-        raise credentials_exception
+        raise Unauthorized()
 
-def get_current_user(token: str = Depends(oauth2_scheme), db=Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+async def get_current_user(token: str = Depends(oauth2_scheme), db=Depends(get_db)):
 
-    email = verify_token(token, credentials_exception)
-    
-    user = User.get_user_by_email(email, db)
+    email = await verify_token(token)
+    if email is None:
+        raise Unauthorized()
+
+    if await is_token_blocked(token):
+        raise Unauthorized() 
+
+    user = await User.get_user_by_email(email, db)
     if not user:
-        raise credentials_exception
+        raise UserNotFound()
     
     return user

@@ -18,10 +18,10 @@ class Address(Base):
     user = relationship("User", back_populates="addresses")
 
 
-    def __repr__(self):
+    async def __repr__(self):
         return f"<Address(id={self.id}, user_id={self.user_id}, address='{self.address}')>"
     
-    def to_dict(self):
+    async def to_dict(self):
         return {
             "id": self.id, 
             "user_id": self.user_id,
@@ -33,21 +33,21 @@ class Address(Base):
         }
     
     @staticmethod
-    def get_address_by_id(id: int, db):
+    async def get_address_by_id(id: int, db):
         return db.query(Address).filter_by(id=id).first()
     
     @staticmethod
-    def get_all_addresses(db):
+    async def get_all_addresses(db):
         return db.query(Address).all()
     
     @staticmethod
-    def create_address(address, db):
+    async def create_address(address, db):
         db.add(address)
         db.refresh(address)
         return address
     
     @staticmethod
-    def update_address(id, db):
+    async def update_address(id, db):
         address = db.query(Address).filter_by(id=id).first()
         if address:
             for key, value in address.dict(exclude_unset=True).items():
@@ -57,7 +57,7 @@ class Address(Base):
         return None
     
     @staticmethod
-    def delete_address(id, db):
+    async def delete_address(id, db):
         address = db.query(Address).filter_by(id=id).first()
         if address:
             db.delete(address)

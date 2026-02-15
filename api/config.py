@@ -7,6 +7,10 @@ class Settings(BaseSettings):
     OPENSSL_KEY: str
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
+    REFRESH_TOKEN_EXPIRE_DAYS: int
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_TOKEN_EXPIRE_MINUTES: int = 15
 
     # class Config:
     #     env_file = ".env"

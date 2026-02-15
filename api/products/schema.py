@@ -12,3 +12,7 @@ class ProductCreate(BaseModel):
 class ProductSchema(ProductCreate):
     id: int
 
+
+class ProductListPagination(BaseModel):
+    limit: int = 10
+    offset: int = 0

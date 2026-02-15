@@ -30,43 +30,43 @@ class Product(Base):
         }
     
     @staticmethod
-    def get_product_by_id(id: int, db):
+    async def get_product_by_id(id: int, db):
         return db.query(Product).filter_by(id=id).first()
 
     @staticmethod
-    def get_product_by_seller(seller_id: int, db):
-        return db.query(Product).filter_by(seller_id=seller_id).all()
+    async def get_product_by_seller(seller_id: int, db, limit: int = 10, offset: int = 0):
+        return db.query(Product).filter_by(seller_id=seller_id).limit(limit).offset(offset).all()
     
     @staticmethod
-    def get_all_products(db):
-        return db.query(Product).all()
+    async def get_all_products(db, limit: int = 10, offset: int = 0):
+        return db.query(Product).limit(limit).offset(offset).all()
     
     @staticmethod
-    def create_product(product, db):
+    async def create_product(product, db):
         db.add(product)
         db.refresh(product)
         return product
     
     @staticmethod
-    def update_product(product, db):
+    async def update_product(product, db):
         merged_product = db.merge(product) # Use merge to handle objects from different sessions
         db.refresh(merged_product)
         return merged_product
     
     @staticmethod
-    def delete_product(product, db):
+    async def delete_product(product, db):
         product = db.merge(product)
         db.delete(product)
         return product
 
     @staticmethod
-    def get_unique_categories(db):
+    async def get_unique_categories(db):
         # Query unique categories, filtering out None/Empty
         results = db.query(Product.category).distinct().all()
         return [r[0] for r in results if r[0]]
 
     @staticmethod
-    def import_products(product_list, db):
+    async def import_products(product_list, db):
         for product in product_list:
             db.add(product)
         return product_list

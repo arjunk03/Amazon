@@ -15,6 +15,13 @@ export const productsApi = {
     },
 
     /**
+     * Get products by current seller
+     */
+    getMyProducts: async (): Promise<Product[]> => {
+        return apiClient.get<Product[]>(`${API_ENDPOINTS.PRODUCTS}seller/my-products`);
+    },
+
+    /**
      * Get product by ID
      */
     getById: async (id: number): Promise<Product> => {
@@ -47,5 +54,14 @@ export const productsApi = {
      */
     delete: async (id: number): Promise<Product> => {
         return apiClient.delete<Product>(API_ENDPOINTS.PRODUCT_BY_ID(id));
+    },
+
+    /**
+     * Import products from CSV
+     */
+    importProducts: async (file: File): Promise<any> => {
+        const formData = new FormData();
+        formData.append('uploaded_file', file);
+        return apiClient.post(API_ENDPOINTS.PRODUCT_IMPORT, formData);
     },
 };

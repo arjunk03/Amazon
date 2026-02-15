@@ -1,13 +1,27 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers.users import user_router
-from routers.products import product_router
+from users.routers import user_router
+from products.routers import product_router
+from address.routers import address_router
 
-from routers.auth import auth_router
+from auth.routers import auth_router
 
-from models.database import init_db
+from database.setup import init_db
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Starting up")
+    yield
+    print("Shutting down")
+
+
+
+app = FastAPI(
+              title="Amazon API",
+              description="Amazon API",
+              version="1.0.0",
+              lifespan=lifespan)
 
 # Configure CORS
 app.add_middleware(
@@ -20,14 +34,22 @@ app.add_middleware(
 
 @app.on_event("startup")
 def on_startup():
+    print("startup event")
     init_db()
+
+@app.on_event("shutdown")
+def on_shutdown():
+    print("shutdown event")
 
 
 @app.get("/")
 def read_root():
     return {"Welcome": "to the Amazon API"}
 
-app.include_router(user_router, prefix="/users", tags=["users"])
-app.include_router(product_router, prefix="/products", tags=["products"])
-app.include_router(auth_router, prefix="/auth", tags=["auth"])
+version = 'v1'
+
+app.include_router(user_router, prefix=f"/{version}", tags=["users"])
+app.include_router(product_router, prefix=f"/{version}", tags=["products"])
+app.include_router(auth_router, prefix=f"/{version}", tags=["auth"])
+app.include_router(address_router, prefix=f"/{version}", tags=["address"])
 

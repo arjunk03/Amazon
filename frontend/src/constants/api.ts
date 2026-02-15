@@ -17,6 +17,7 @@ export const API_ENDPOINTS = {
     PRODUCTS: '/products/',
     PRODUCT_BY_ID: (id: number) => `/products/${id}`,
     PRODUCT_CATEGORIES: '/products/categories',
+    PRODUCT_IMPORT: '/products/import',
 
     // Orders (for future use)
     ORDERS: '/orders/',

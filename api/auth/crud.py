@@ -1,5 +1,5 @@
-from models.users import User
-from schema.auth import LoginRequest, LoginResponse, Token
+from users.model import User
+from .schema import LoginRequest, Token, LoginResponse
 from utils.security import verify_password
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from oauth2 import create_access_token
@@ -40,7 +40,7 @@ class AuthCRUD:
             )
 
         # Return user data and placeholder token
-        from schema.users import UserSchema
+        from users.schema import UserSchema
 
         user_schema = UserSchema(
             id=user.id,

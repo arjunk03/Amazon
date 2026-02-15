@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
-from .database import Base        
+from database.setup import Base        
 
 class User(Base):
     __tablename__ = "users"
@@ -45,7 +45,6 @@ class User(Base):
     @staticmethod
     def create_user(user, db):
         db.add(user)
-        db.commit()
         db.refresh(user)
         return user
     
@@ -55,7 +54,6 @@ class User(Base):
         if user:
             for key, value in user_schema.dict(exclude_unset=True).items():
                 setattr(user, key, value)
-            db.commit()
             db.refresh(user)
             return user
 
@@ -64,6 +62,5 @@ class User(Base):
         user = db.query(User).filter_by(id=user_id).first()
         if user:
             db.delete(user)
-            db.commit()
             return user
     

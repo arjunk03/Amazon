@@ -1,6 +1,6 @@
 
-from models.users import User
-from schema.users import UserRegister, UserSchema
+from .model import User
+from .schema import UserRegister, UserSchema
 from utils.security import hash_password
 
 

@@ -3,7 +3,8 @@ from pydantic import BaseModel
 class ProductCreate(BaseModel):
     title: str
     description: str
-    price: int
+    price: float
+    stock: int = 0
     imageUrl: str
     category: str
     seller_id: int

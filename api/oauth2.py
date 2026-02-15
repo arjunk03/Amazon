@@ -1,19 +1,16 @@
-import os
-from dotenv import load_dotenv
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from fastapi import HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from dependency import get_db
-from fastapi import Depends
-from models.users import User
+from fastapi import Depends 
+from users.model import User
+from config import settings
 
 
-load_dotenv()
-
-OPENSSL_KEY = os.getenv("OPENSSL_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+OPENSSL_KEY = settings.OPENSSL_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 # ACCESS_TOKEN_EXPIRE_MINUTES = 1  
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
@@ -53,5 +50,5 @@ def get_current_user(token: str = Depends(oauth2_scheme), db=Depends(get_db)):
     user = User.get_user_by_email(email, db)
     if not user:
         raise credentials_exception
-
+    
     return user

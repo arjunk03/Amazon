@@ -26,6 +26,7 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { CustomerServicePage } from './pages/CustomerServicePage';
 import { RegistryPage } from './pages/RegistryPage';
 import { GiftCardsPage } from './pages/GiftCardsPage';
+import { SellerImportProductsPage } from './pages/SellerImportProductsPage';
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
               <Route path="seller/register" element={<SellerRegisterPage />} />
               <Route path="seller/dashboard" element={<SellerDashboard />} />
               <Route path="seller/add-product" element={<AddProductPage />} />
+              <Route path="seller/import-products" element={<SellerImportProductsPage />} />
               <Route path="seller/edit-product/:id" element={<AddProductPage />} />
               <Route path="forgot-password" element={<ForgotPasswordPage />} />
               <Route path="account/orders" element={<AccountOrdersPage />} />

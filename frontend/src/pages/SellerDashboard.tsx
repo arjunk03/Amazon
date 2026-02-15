@@ -13,10 +13,8 @@ export function SellerDashboard() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const data = await productsApi.getAll();
-                // Filter products by current seller
-                const filtered = data.filter(p => p.seller_id === user?.id);
-                setProducts(filtered);
+                const data = await productsApi.getMyProducts();
+                setProducts(data);
             } catch (err) {
                 setError('Failed to load products');
             } finally {
@@ -39,12 +37,20 @@ export function SellerDashboard() {
         <div className="max-w-6xl mx-auto p-6">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-2xl font-bold text-gray-900 font-amazon-ember">Seller Central Dashboard</h1>
-                <Link
-                    to="/seller/add-product"
-                    className="bg-amazon-orange text-white px-4 py-2 rounded-md font-medium hover:bg-amber-500 transition-colors"
-                >
-                    Add New Product
-                </Link>
+                <div className="flex space-x-4">
+                    <Link
+                        to="/seller/import-products"
+                        className="bg-white text-amazon-dark border border-gray-300 px-4 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors"
+                    >
+                        Import Products
+                    </Link>
+                    <Link
+                        to="/seller/add-product"
+                        className="bg-amazon-orange text-white px-4 py-2 rounded-md font-medium hover:bg-amber-500 transition-colors"
+                    >
+                        Add New Product
+                    </Link>
+                </div>
             </div>
 
             {isLoading ? (

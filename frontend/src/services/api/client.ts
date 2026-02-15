@@ -4,6 +4,7 @@
 
 import { env } from '../../config/env';
 import { REQUEST_TIMEOUT } from '../../constants';
+import { storage, STORAGE_KEYS } from '../../utils';
 
 export class ApiError extends Error {
     constructor(
@@ -38,14 +39,24 @@ class ApiClient {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+        const token = storage.get(STORAGE_KEYS.AUTH_TOKEN);
+        const headers: HeadersInit = {
+            ...fetchConfig.headers,
+        };
+
+        if (token) {
+            (headers as any)['Authorization'] = `Bearer ${token}`;
+        }
+
+        if (!(fetchConfig.body instanceof FormData)) {
+            (headers as any)['Content-Type'] = 'application/json';
+        }
+
         try {
             const response = await fetch(url, {
                 ...fetchConfig,
                 signal: controller.signal,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...fetchConfig.headers,
-                },
+                headers,
             });
 
             clearTimeout(timeoutId);
@@ -59,7 +70,9 @@ class ApiClient {
                 }
 
                 throw new ApiError(
-                    (errorData as { detail?: string })?.detail ||
+                    (Array.isArray((errorData as { detail?: any })?.detail)
+                        ? (errorData as { detail?: any[] }).detail?.map(d => d.msg).join(', ')
+                        : (errorData as { detail?: string })?.detail) ||
                     (errorData as { message?: string })?.message ||
                     `Request failed with status ${response.status}`,
                     response.status,
@@ -104,7 +117,9 @@ class ApiClient {
         return this.request<T>(endpoint, {
             ...config,
             method: 'POST',
-            body: data ? JSON.stringify(data) : undefined,
+            body: data
+                ? (data instanceof FormData ? data : JSON.stringify(data))
+                : undefined,
         });
     }
 
@@ -116,7 +131,9 @@ class ApiClient {
         return this.request<T>(endpoint, {
             ...config,
             method: 'PUT',
-            body: data ? JSON.stringify(data) : undefined,
+            body: data
+                ? (data instanceof FormData ? data : JSON.stringify(data))
+                : undefined,
         });
     }
 
@@ -132,7 +149,9 @@ class ApiClient {
         return this.request<T>(endpoint, {
             ...config,
             method: 'PATCH',
-            body: data ? JSON.stringify(data) : undefined,
+            body: data
+                ? (data instanceof FormData ? data : JSON.stringify(data))
+                : undefined,
         });
     }
 }

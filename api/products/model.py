@@ -1,18 +1,18 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Float
-from database.setup import Base
 from sqlalchemy.orm import relationship
+from sqlmodel import SQLModel, Field, select
 
-class Product(Base):
+class Product(SQLModel, table=True):
     __tablename__ = "products"
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, unique=True, index=True)
-    description = Column(String)
-    price = Column(Float)
-    stock = Column(Integer, default=0)
-    imageUrl = Column(String)
-    category = Column(String)  # New column for category grouping
-    seller_id = Column(Integer, ForeignKey("users.id"))
-    seller = relationship("User", back_populates="products") 
+    id: int | None = Field(default=None, primary_key=True)
+    title: str = Field(index=True)
+    description: str
+    price: float
+    stock: int = Field(default=0)
+    imageUrl: str
+    category: str = Field(index=True)  # New column for category grouping
+    seller_id: int = Field(ForeignKey("users.id"))
+    # seller = relationship("User", back_populates="products") 
 
     def __repr__(self):
         return f"<Product(id={self.id}, title='{self.title}', price={self.price}, stock={self.stock}, category='{self.category}')>"
@@ -31,15 +31,15 @@ class Product(Base):
     
     @staticmethod
     def get_product_by_id(id: int, db):
-        return db.query(Product).filter_by(id=id).first()
+        return db.exec(select(Product).where(Product.id == id)).first()
 
     @staticmethod
     def get_product_by_seller(seller_id: int, db):
-        return db.query(Product).filter_by(seller_id=seller_id).all()
+        return db.exec(select(Product).where(Product.seller_id == seller_id)).all()
     
     @staticmethod
     def get_all_products(db):
-        return db.query(Product).all()
+        return db.exec(select(Product)).all()
     
     @staticmethod
     def create_product(product, db):
@@ -62,8 +62,8 @@ class Product(Base):
     @staticmethod
     def get_unique_categories(db):
         # Query unique categories, filtering out None/Empty
-        results = db.query(Product.category).distinct().all()
-        return [r[0] for r in results if r[0]]
+        results = db.exec(select(Product.category).distinct()).all()
+        return [r for r in results if r]
 
     @staticmethod
     def import_products(product_list, db):

@@ -2,7 +2,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from fastapi import HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from dependency import get_db
+from dependency import SessionDep
 from fastapi import Depends 
 from users.model import User
 from config import settings
@@ -38,7 +38,7 @@ def verify_token(token: str, credentials_exception):
     except JWTError:
         raise credentials_exception
 
-def get_current_user(token: str = Depends(oauth2_scheme), db=Depends(get_db)):
+def get_current_user(token: str = Depends(oauth2_scheme), db: SessionDep = None):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

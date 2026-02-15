@@ -38,23 +38,28 @@ class Address(Base):
     
     @staticmethod
     def get_all_addresses(db):
-            return db.query(Address).all()
+        return db.query(Address).all()
     
     @staticmethod
     def create_address(address, db):
         db.add(address)
-        db.commit()
         db.refresh(address)
         return address
     
     @staticmethod
-    def update_address(address, db):
-        db.commit()
-        db.refresh(address)
-        return address
+    def update_address(id, db):
+        address = db.query(Address).filter_by(id=id).first()
+        if address:
+            for key, value in address.dict(exclude_unset=True).items():
+                setattr(address, key, value)
+            db.refresh(address)
+            return address
+        return None
     
     @staticmethod
-    def delete_address(address, db):
-        db.delete(address)
-        db.commit()
-        return address
+    def delete_address(id, db):
+        address = db.query(Address).filter_by(id=id).first()
+        if address:
+            db.delete(address)
+            return address
+        return None
